@@ -1,0 +1,38 @@
+[
+  {
+    "id": "eval-001",
+    "question": "What are the major AI trends in software engineering?",
+    "expected_min_sub_questions": 4,
+    "expected_min_sources": 3,
+    "must_cite": true
+  },
+  {
+    "id": "eval-002",
+    "question": "How will generative AI affect junior developer hiring over the next 5 years?",
+    "expected_min_sub_questions": 4,
+    "expected_min_sources": 3,
+    "must_cite": true,
+    "expect_conflicting_evidence": true
+  },
+  {
+    "id": "eval-003",
+    "question": "What is the current enterprise adoption rate of AI coding assistants?",
+    "expected_min_sub_questions": 3,
+    "expected_min_sources": 2,
+    "must_cite": true
+  },
+  {
+    "id": "eval-004",
+    "question": "What new job roles are emerging because of AI in the tech industry?",
+    "expected_min_sub_questions": 4,
+    "expected_min_sources": 3,
+    "must_cite": true
+  },
+  {
+    "id": "eval-005",
+    "question": "What skills should developers prioritize learning given AI's impact on the field?",
+    "expected_min_sub_questions": 4,
+    "expected_min_sources": 3,
+    "must_cite": true
+  }
+]

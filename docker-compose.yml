@@ -1,0 +1,82 @@
+services:
+  db:
+    image: ankane/pgvector:latest
+    security_opt:
+      - apparmor:unconfined
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: research_user
+      POSTGRES_PASSWORD: research_pass
+      POSTGRES_DB: research_agent
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U research_user -d research_agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    security_opt:
+      - apparmor:unconfined
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql://research_user:research_pass@db:5432/research_agent
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  worker:
+    build: ./backend
+    restart: unless-stopped
+    command: celery -A app.workers.research_worker worker --loglevel=info
+    env_file:
+      - ./backend/.env
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql://research_user:research_pass@db:5432/research_agent
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:8000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
