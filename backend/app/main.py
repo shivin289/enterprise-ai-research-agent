@@ -15,13 +15,12 @@ from app.db.database import Base, engine
 settings = get_settings()
 configure_logging()
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # For local dev/demo, auto-create tables. In production, use Alembic
-    # migrations (see app/db/migrations/) instead of create_all.
-    if settings.app_env == "development":
-        Base.metadata.create_all(bind=engine)
+    # No Alembic migrations wired up yet, so we create tables on every
+    # startup regardless of environment. Safe to run repeatedly --
+    # create_all() only creates tables that don't already exist.
+    Base.metadata.create_all(bind=engine)
     yield
 
 
