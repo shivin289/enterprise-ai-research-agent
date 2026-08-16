@@ -1,5 +1,19 @@
 # Enterprise AI Research Agent
 
+
+**🔗 Live demo:** https://enterprise-ai-research-agent-1b78.vercel.app
+**🔗 API docs:** https://enterprise-ai-research-agent-6amb.onrender.com/docs
+
+> Deployed on free-tier hosting (Vercel + Render + Neon + Upstash). The
+> backend spins down after 15 minutes of inactivity (Render free tier) —
+> the first request after idle time takes ~30-60s to wake up, which is
+> expected, not a bug. Currently running `SEARCH_PROVIDER=mock` (placeholder
+> sources) with `LLM_PROVIDER=groq` (real AI reasoning, free tier) — see
+> the "Running without any API keys" section below for what that means.
+
+
+
+
 A modular RAG research system that decomposes a broad research query into
 sub-questions, retrieves and validates evidence from multiple sources,
 detects conflicting information, and produces a citation-backed report —
@@ -130,6 +144,29 @@ LLM-facing prompts once you see real output, that's the part to iterate on.
 **Infra:** Docker Compose
 
 ---
+
+## Deployment
+
+The live demo linked at the top runs on a free, distributed hosting stack:
+
+| Piece | Provider | Notes |
+|---|---|---|
+| Frontend | [Vercel](https://vercel.com) | Static Vite build, auto-deploys on push to `main`/`master` |
+| Backend | [Render](https://render.com) | Free web service, Docker runtime, spins down after 15min idle |
+| Database | [Neon](https://neon.tech) | Serverless Postgres, permanent free tier, pgvector built in |
+| Cache | [Upstash](https://upstash.com) | Redis, free tier |
+| LLM | [Groq](https://groq.com) | Free tier, OpenAI-compatible API, Llama 3.3 70B |
+
+To deploy your own copy: fork the repo, then point each service at the
+`backend` or `frontend` subdirectory as the root, set the environment
+variables from `.env.example` in each service's dashboard (not committed
+to the repo — set them directly in Render/Vercel), and set `VITE_API_URL`
+on Vercel to your Render backend's URL.
+
+**CORS note:** `backend/app/main.py` allows a hardcoded list of origins
+in production (not `*`, since that's insecure for a deployed API with
+auth). Add your own deployed frontend URL to that list before deploying.
+
 
 ## Running locally
 
