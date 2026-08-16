@@ -132,7 +132,7 @@ class GroqProvider(LLMProvider):
     def __init__(self) -> None:
         from openai import AsyncOpenAI
 
-        self.client = AsyncOpenAI(api_key=settings.groq_api_key, base_url=self.BASE_URL)
+        self.client = AsyncOpenAI(api_key=settings.groq_api_key, base_url=self.BASE_URL, timeout=60.0)
         self.model = settings.groq_model
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10))
@@ -156,12 +156,18 @@ class GroqProvider(LLMProvider):
         messages.append({"role": "system", "content": base_system})
         messages.append({"role": "user", "content": prompt})
 
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=temperature,
-            response_format={"type": "json_object"},
-        )
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=temperature,
+                response_format={"type": "json_object"},
+            )
+        except Exception as exc:
+            logger.error("Groq API call failed: %s: %s", type(exc).__name__, str(exc))
+            raise
+        raw = response.choices[0].message.content or "{}"
+        return json.loads(raw)
         raw = response.choices[0].message.content or "{}"
         return json.loads(raw)
 
