@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     
     # Groq -- OpenAI-compatible free-tier provider, no billing required
     groq_api_key: str = ""
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "openai/gpt-oss-120b"
     search_provider: str = "mock"
     tavily_api_key: str = ""
     serpapi_api_key: str = ""
