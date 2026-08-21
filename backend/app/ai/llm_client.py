@@ -164,7 +164,10 @@ class GroqProvider(LLMProvider):
                 response_format={"type": "json_object"},
             )
         except Exception as exc:
-            logger.error("Groq API call failed: %s: %s", type(exc).__name__, str(exc))
+            logger.error(
+                "Groq API call failed: %s: %s | underlying cause: %r",
+                type(exc).__name__, str(exc), exc.__cause__,
+            )
             raise
         raw = response.choices[0].message.content or "{}"
         return json.loads(raw)
